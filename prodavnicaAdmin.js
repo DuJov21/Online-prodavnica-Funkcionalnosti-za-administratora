@@ -37,8 +37,15 @@ function renderTabela() {
         tr.appendChild(tdNaziv)
         tr.appendChild(tdCena)
 
+        tr.addEventListener("click", () => prikaziDetalje(proizvod))
+
         tbody.appendChild(tr)
     })
+}
+function prikaziDetalje(proizvod) {
+    document.getElementById("detail-naziv").textContent = proizvod.naziv
+    document.getElementById("detail-cena").textContent = proizvod.cena
+    document.getElementById("detail-opis").textContent = proizvod.opis
 }
 // Poziv da odmah popuni tabelu
 renderTabela()
