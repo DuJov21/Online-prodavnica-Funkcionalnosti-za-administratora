@@ -2,7 +2,8 @@
     display: block;
     margin: 3px;
     border: 1px solid black;
-    height: 90vh;
+    height: 100vh;
+    border-bottom: none;
 }
 
 .container>h1 {

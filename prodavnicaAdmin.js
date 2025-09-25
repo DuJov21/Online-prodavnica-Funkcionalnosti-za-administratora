@@ -9,17 +9,32 @@ class Artikal {
     }
 }
 
-// Niz proizvoda
-let proizvodi = [
-    new Artikal(1, "Monitor", 165, "Full HD monitor 24 inča"),
-    new Artikal(2, "TV", 650, "Smart TV 55 inča"),
-    new Artikal(3, "Miš", 20, "Bežični miš")
-]
+const STORAGE_KEY = "proizvodi"
 
-// Funkcija za prikaz proizvoda u tabeli
+let proizvodi = []
+
+function sacuvajProizvode() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(proizvodi))
+}
+
+function ucitajProizvode() {
+    let sacuvano = localStorage.getItem(STORAGE_KEY)
+    if (sacuvano) {
+        let parsed = JSON.parse(sacuvano)
+        proizvodi = parsed.map(p => new Artikal(p.id, p.naziv, p.cena, p.opis))
+    } else {
+        proizvodi = [
+            new Artikal(1, "Monitor", 165, "Full HD monitor 24 inča"),
+            new Artikal(2, "TV", 650, "Smart TV 55 inča"),
+            new Artikal(3, "Miš", 20, "Bežični miš")
+        ]
+        sacuvajProizvode()
+    }
+}
+
 function renderTabela() {
     let tbody = document.querySelector(".products-table tbody")
-    tbody.innerHTML = "" // očisti prethodne redove
+    tbody.innerHTML = ""
 
     proizvodi.forEach(proizvod => {
         let tr = document.createElement("tr")
@@ -37,20 +52,21 @@ function renderTabela() {
         tr.appendChild(tdNaziv)
         tr.appendChild(tdCena)
 
+
         tr.addEventListener("click", () => prikaziDetalje(proizvod))
 
         tbody.appendChild(tr)
     })
 }
+
 function prikaziDetalje(proizvod) {
     document.getElementById("detail-naziv").textContent = proizvod.naziv
     document.getElementById("detail-cena").textContent = proizvod.cena
     document.getElementById("detail-opis").textContent = proizvod.opis
 }
 
-// Funkcija za dodavanje novog artikla iz forme
 function dodajNoviArtikal(e) {
-    e.preventDefault() // sprečava reload stranice
+    e.preventDefault()
 
     let naziv = document.getElementById("naziv").value.trim()
     let cena = Number(document.getElementById("cena").value)
@@ -61,26 +77,26 @@ function dodajNoviArtikal(e) {
         return
     }
 
-    // Provera da li artikal već postoji po nazivu
     let postoji = proizvodi.some(p => p.naziv.toLowerCase() === naziv.toLowerCase())
     if (postoji) {
         alert("Artikal sa tim nazivom već postoji!")
         return
     }
 
-    // Kreiramo novi artikal sa sledećim ID
-    let noviId = proizvodi.length > 0 ? proizvodi[proizvodi.length - 1].id + 1 : 1
+    let noviId = proizvodi.length > 0 ? Math.max(...proizvodi.map(p => p.id)) + 1 : 1
     let noviArtikal = new Artikal(noviId, naziv, cena, opis)
 
-    // Dodaj u niz
     proizvodi.push(noviArtikal)
 
-    // Ponovo iscrtaj tabelu
+    sacuvajProizvode()
+
     renderTabela()
 
-    // Očisti formu
     document.querySelector(".product-form").reset()
 }
-// Poziv da odmah popuni tabelu
-renderTabela()
-document.querySelector(".product-form").addEventListener("submit", dodajNoviArtikal)
+
+window.addEventListener("DOMContentLoaded", () => {
+    ucitajProizvode()
+    renderTabela()
+    document.querySelector(".product-form").addEventListener("submit", dodajNoviArtikal)
+})
