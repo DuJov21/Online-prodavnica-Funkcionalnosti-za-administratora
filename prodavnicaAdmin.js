@@ -47,5 +47,40 @@ function prikaziDetalje(proizvod) {
     document.getElementById("detail-cena").textContent = proizvod.cena
     document.getElementById("detail-opis").textContent = proizvod.opis
 }
+
+// Funkcija za dodavanje novog artikla iz forme
+function dodajNoviArtikal(e) {
+    e.preventDefault() // sprečava reload stranice
+
+    let naziv = document.getElementById("naziv").value.trim()
+    let cena = Number(document.getElementById("cena").value)
+    let opis = document.getElementById("opis").value.trim()
+
+    if (!naziv || !cena) {
+        alert("Naziv i cena su obavezni!")
+        return
+    }
+
+    // Provera da li artikal već postoji po nazivu
+    let postoji = proizvodi.some(p => p.naziv.toLowerCase() === naziv.toLowerCase())
+    if (postoji) {
+        alert("Artikal sa tim nazivom već postoji!")
+        return
+    }
+
+    // Kreiramo novi artikal sa sledećim ID
+    let noviId = proizvodi.length > 0 ? proizvodi[proizvodi.length - 1].id + 1 : 1
+    let noviArtikal = new Artikal(noviId, naziv, cena, opis)
+
+    // Dodaj u niz
+    proizvodi.push(noviArtikal)
+
+    // Ponovo iscrtaj tabelu
+    renderTabela()
+
+    // Očisti formu
+    document.querySelector(".product-form").reset()
+}
 // Poziv da odmah popuni tabelu
 renderTabela()
+document.querySelector(".product-form").addEventListener("submit", dodajNoviArtikal)
